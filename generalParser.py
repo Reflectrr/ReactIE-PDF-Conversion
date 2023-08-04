@@ -7,11 +7,13 @@ import ReactIE_PDF_Conversion.helpers.fileIOHelper as fileIOHelper
 import ReactIE_PDF_Conversion.config as config
 from ReactIE_PDF_Conversion.postprocess import cleanJson
 
+srcPath = "ReactIE_PDF_Conversion"
+
 # given a path to a pdf file, parse the pdf file and output a json file
 # both symbol scraper and xml parser are run
 def parseFile(pdfPath: str):
     # create temp dir if not exist
-    tempDirPath = "./xmlFiles/"
+    tempDirPath = f"{srcPath}/xmlFiles/"
     if not os.path.exists(tempDirPath):
         os.mkdir(tempDirPath)
     # don't run SymbolScraper if xml already parsed
@@ -22,17 +24,17 @@ def parseFile(pdfPath: str):
     else:
         print("Parsing", pdfPath)
         os.system(
-            "SymbolScraper/bin/sscraper " + pdfPath + " " + tempDirPath + " > /dev/null"
+            f"{srcPath}/SymbolScraper/bin/sscraper " + pdfPath + " " + tempDirPath + " > /dev/null"
         )
         print("Step 1: Parse PDF into XML using Symbol Scraper, written to:", xmlPath)
     # don't parse xml if json already exists
-    targetJsonPath = os.getcwd() + "/result/" + pdfPath.split("/")[-1][:-4] + ".json"
+    targetJsonPath = srcPath + "/result/" + pdfPath.split("/")[-1][:-4] + ".json"
     if os.path.exists(targetJsonPath):
         print("JSON file already exists")
         # parse(xmlPath)
     else:    
         parse(xmlPath)
-    targetCleanJsonPath = os.getcwd() + "/final_result/" + pdfPath.split("/")[-1][:-4] + ".json"
+    targetCleanJsonPath = srcPath + "/final_result/" + pdfPath.split("/")[-1][:-4] + ".json"
     if os.path.exists(targetCleanJsonPath):
         print("Clean JSON file already exists")
         return
@@ -111,10 +113,8 @@ if __name__ == "__main__":
             parseFile(inputfile)
         elif opt == "-c":
             fileIOHelper.cleanFolders()
-            cwd = os.getcwd()
-            target_dir = os.path.join(cwd, config.defaultDir)
+            target_dir = os.path.join(srcPath, config.defaultDir)
             parseFolder(target_dir)
     if not opts:
-        cwd = os.getcwd()
-        target_dir = os.path.join(cwd, config.defaultDir)
+        target_dir = os.path.join(srcPath, config.defaultDir)
         parseFolder(target_dir)

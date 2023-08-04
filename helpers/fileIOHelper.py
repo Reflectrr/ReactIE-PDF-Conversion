@@ -2,10 +2,11 @@ import os
 import json
 import shutil
 
+srcPath = "ReactIE_PDF_Conversion"
+
 def outputDirtyJsonFile(xmlPath, output):
     outputFileName = xmlPath.split("/")[-1][:-4] + ".json"
-    path = os.getcwd()
-    result_directory = path + "/result/"
+    result_directory = srcPath + "/result/"
     if not os.path.exists(result_directory):
         os.mkdir(result_directory)
     outputFilePath = result_directory + outputFileName
@@ -16,8 +17,7 @@ def outputDirtyJsonFile(xmlPath, output):
 
 def outputCleanJsonFile(jsonPath, output):
     outputFileName = jsonPath.split("/")[-1][:-5] + ".json"
-    path = os.getcwd()
-    result_directory = path + "/final_result/"
+    result_directory = srcPath + "/../json/"
     if not os.path.exists(result_directory):
         os.mkdir(result_directory)
     outputFilePath = result_directory + outputFileName
@@ -35,10 +35,10 @@ def validateFilename(inputfile: str):
 
 # clear everything in the xml and result folder
 def cleanFolders():
-    path = os.getcwd()
-    xml_directory = path + "/xmlFiles/"
-    result_directory = path + "/result/"
-    final_result_directory = path + "/filtered_result/"
+    
+    xml_directory = srcPath + "/xmlFiles/"
+    result_directory = srcPath + "/result/"
+    final_result_directory = srcPath + "/filtered_result/"
     if os.path.exists(xml_directory):
         shutil.rmtree(xml_directory)
     if os.path.exists(result_directory):
