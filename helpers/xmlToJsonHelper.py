@@ -42,17 +42,6 @@ def buildWord(wordXml):
         )
     return wordBuf
 
-# def checkSideLine(lineXml):
-#     location = lineXml.attrib["BBOX"].split(" ")[0]
-#     return location in ["9.0", "18.0"]
-
-
-# def checkIgnoredPrefix(line):
-#     for prefix in ignoredSuffix:
-#         if line.startswith(prefix):
-#             return True
-#     return False
-
 # find the two most common line start positions
 def findOffset(root):
     lineStartPos = collections.defaultdict(int)
@@ -73,7 +62,7 @@ def checkStartParagrph(lineXmlBBOX, paragraphStart):
 def checkEndOfPage(text):
     text = text.lower()
     # check if line starts with one of figure keywords (ignoring case)
-    if re.match("^(scheme|table|figure) [1-9]. ", text) or re.match("^fig. [0-9]+", text):
+    if re.match("^(scheme|table|figure) [1-9]+", text) or re.match("^fig. [0-9]+", text):
         return True
     else:
         return False
