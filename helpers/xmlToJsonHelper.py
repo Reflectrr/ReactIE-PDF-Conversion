@@ -1,5 +1,5 @@
 import collections
-import config
+import ReactIE_PDF_Conversion.config as config
 import re
 
 tabWidth = config.tabWidth

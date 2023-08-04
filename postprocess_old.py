@@ -4,7 +4,7 @@ import torch
 import numpy as np
 from transformers import AutoTokenizer, AutoModel
 import math
-from helpers.fileIOHelper import outputCleanJsonFile
+from ReactIE_PDF_Conversion.helpers.fileIOHelper import outputCleanJsonFile
 
 device = torch.device(4)
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")

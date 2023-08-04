@@ -1,11 +1,11 @@
 import xml.etree.ElementTree as ET
 import os
 import sys, getopt
-import helpers.pdfToXmlHelper as pdfToXmlHelper
-import helpers.xmlToJsonHelper as xmlToJsonHelper
-import helpers.fileIOHelper as fileIOHelper
-import config
-from postprocess import cleanJson
+import ReactIE_PDF_Conversion.helpers.pdfToXmlHelper as pdfToXmlHelper
+import ReactIE_PDF_Conversion.helpers.xmlToJsonHelper as xmlToJsonHelper
+import ReactIE_PDF_Conversion.helpers.fileIOHelper as fileIOHelper
+import ReactIE_PDF_Conversion.config as config
+from ReactIE_PDF_Conversion.postprocess import cleanJson
 
 # given a path to a pdf file, parse the pdf file and output a json file
 # both symbol scraper and xml parser are run
