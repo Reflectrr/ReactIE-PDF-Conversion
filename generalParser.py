@@ -5,6 +5,7 @@ import helpers.pdfToXmlHelper as pdfToXmlHelper
 import helpers.xmlToJsonHelper as xmlToJsonHelper
 import helpers.fileIOHelper as fileIOHelper
 import config
+import datetime
 from postprocess import cleanJson
 
 # given a path to a pdf file, parse the pdf file and output a json file
@@ -42,6 +43,13 @@ def parseFile(pdfPath: str):
     for mdFile in os.listdir(pdfDirPath):
         if mdFile.endswith(".md") and mdFile != "README.md":
             os.remove(pdfDirPath + "/" + mdFile)
+    # write to the end of log.txt with timestamp
+    logPath = os.getcwd() + "/log.txt"
+    with open(logPath, "a") as logFile:
+        currentTime = datetime.datetime.now()
+        basename = os.path.basename(pdfPath)
+        # logFile.write("Parsed " + basename + " at " + currentTime.strftime("%Y-%m-%d %H:%M:%S") + "\n")
+        logFile.write(currentTime.strftime("%Y-%m-%d %H:%M:%S") + " " + basename + "\n")
 
 # given a path to a folder, recursively parse all pdf files in it
 def parseFolder(folderPath: str):
@@ -102,7 +110,7 @@ if __name__ == "__main__":
     opts, args = getopt.getopt(argv, "chi:")
     for opt, arg in opts:
         if opt == "-h":
-            print("[Usage]: python3 xmlParser.py -i <inputPDF>")
+            print("[Usage]: python3 generalParser.py -i <inputPDF>")
             print("Result will be saved as a .json file in the results/ folder")
             sys.exit()
         elif opt == "-i":
