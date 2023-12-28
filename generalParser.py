@@ -1,16 +1,20 @@
 import xml.etree.ElementTree as ET
 import os
-import sys, getopt
+import sys
+import getopt
 import helpers.pdfToXmlHelper as pdfToXmlHelper
 import helpers.xmlToJsonHelper as xmlToJsonHelper
 import helpers.fileIOHelper as fileIOHelper
+import helpers.logHelper as logHelper
 import config
 import datetime
 from postprocess import cleanJson
 
-# given a path to a pdf file, parse the pdf file and output a json file
-# both symbol scraper and xml parser are run
+
 def parseFile(pdfPath: str):
+    # given a path to a pdf file, parse the pdf file and output a json file
+    # both symbol scraper and xml parser are run
+
     # create temp dir if not exist
     tempDirPath = "./xmlFiles/"
     if not os.path.exists(tempDirPath):
@@ -22,17 +26,25 @@ def parseFile(pdfPath: str):
         print("xmlpath", xmlPath)
     else:
         print("Parsing", pdfPath)
-        os.system(
+        exitCode = os.system(
             "SymbolScraper/bin/sscraper " + pdfPath + " " + tempDirPath + " > /dev/null"
         )
+        if exitCode != 0:
+            print("Error: SymbolScraper failed to parse", pdfPath)
+            logHelper.errorLog(pdfPath)
+            return
         print("Step 1: Parse PDF into XML using Symbol Scraper, written to:", xmlPath)
     # don't parse xml if json already exists
     targetJsonPath = os.getcwd() + "/parsed_raw/" + pdfPath.split("/")[-1][:-4] + ".json"
     if os.path.exists(targetJsonPath):
         print("JSON file already exists")
-    else:    
-        parse(xmlPath)
-    targetCleanJsonPath = os.getcwd() + "/results/" + pdfPath.split("/")[-1][:-4] + ".json"
+    else:
+        parseExitCode = parse(xmlPath)
+        if parseExitCode == -1:
+            print("Error: Parse XML failed, skipping", pdfPath)
+            return
+    targetCleanJsonPath = os.getcwd() + "/results/" + \
+        pdfPath.split("/")[-1][:-4] + ".json"
     if os.path.exists(targetCleanJsonPath):
         print("Clean JSON file already exists")
         return
@@ -44,15 +56,12 @@ def parseFile(pdfPath: str):
         if mdFile.endswith(".md") and mdFile != "README.md":
             os.remove(pdfDirPath + "/" + mdFile)
     # write to the end of log.txt with timestamp
-    logPath = os.getcwd() + "/log.txt"
-    with open(logPath, "a") as logFile:
-        currentTime = datetime.datetime.now()
-        basename = os.path.basename(pdfPath)
-        # logFile.write("Parsed " + basename + " at " + currentTime.strftime("%Y-%m-%d %H:%M:%S") + "\n")
-        logFile.write(currentTime.strftime("%Y-%m-%d %H:%M:%S") + " " + basename + "\n")
+    logHelper.successLog(pdfPath)
 
-# given a path to a folder, recursively parse all pdf files in it
+
 def parseFolder(folderPath: str):
+    # given a path to a folder, recursively parse all pdf files in it
+
     for item in sorted(os.listdir(folderPath)):
         itemPath = os.path.join(folderPath, item)
         if itemPath.endswith(".pdf"):
@@ -63,8 +72,10 @@ def parseFolder(folderPath: str):
             parseFolder(validPath)
         # print()
 
-# given a path to a xml file, parse the xml file and output a json file
+
 def parse(inputXml: str):
+    # given a path to a xml file, parse the xml file and output a json file
+
     pdfToXmlHelper.preParseXML(inputXml)
     tree = ET.parse(inputXml)  # improvement: change to argument based input
     root = tree.getroot()
@@ -73,7 +84,7 @@ def parse(inputXml: str):
     output["fullText"] = ""
     output["content"] = []
 
-    paragraphStart =xmlToJsonHelper.findOffset(root)
+    paragraphStart = xmlToJsonHelper.findOffset(root)
 
     for pageXml in root.iter("Page"):
         prevLineBBOX = None
@@ -82,8 +93,8 @@ def parse(inputXml: str):
             lineContent = ""
             lineXMLBBOX = lineXml.attrib["BBOX"]
             for wordXml in lineXml.iter("Word"):
-                word =xmlToJsonHelper.buildWord(wordXml)
-                lineContent =xmlToJsonHelper.updateText(lineContent, word)
+                word = xmlToJsonHelper.buildWord(wordXml)
+                lineContent = xmlToJsonHelper.updateText(lineContent, word)
             lineContent = lineContent.strip()
 
             # if the line is a graph, skip the rest of the page
@@ -102,6 +113,7 @@ def parse(inputXml: str):
             else:
                 prevLineBBOX = lineXMLBBOX
     fileIOHelper.outputDirtyJsonFile(inputXml, output)
+
 
 # main function
 if __name__ == "__main__":
