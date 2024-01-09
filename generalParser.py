@@ -26,10 +26,10 @@ def parseFile(pdfPath: str):
         print("xmlpath", xmlPath)
     else:
         print("Parsing", pdfPath)
-        exitCode = os.system(
+        os.system(
             "SymbolScraper/bin/sscraper " + pdfPath + " " + tempDirPath + " > /dev/null"
         )
-        if exitCode != 0:
+        if not os.path.exists(xmlPath):
             print("Error: SymbolScraper failed to parse", pdfPath)
             logHelper.errorLog(pdfPath)
             return
@@ -77,7 +77,12 @@ def parse(inputXml: str):
     # given a path to a xml file, parse the xml file and output a json file
 
     pdfToXmlHelper.preParseXML(inputXml)
-    tree = ET.parse(inputXml)  # improvement: change to argument based input
+    try:
+        tree = ET.parse(inputXml)  # improvement: change to argument based input
+    except ET.ParseError:
+        print("Error: Parse XML failed, skipping", inputXml)
+        logHelper.errorLog(inputXml)
+        return -1
     root = tree.getroot()
 
     output = {}
@@ -136,4 +141,5 @@ if __name__ == "__main__":
     if not opts:
         cwd = os.getcwd()
         target_dir = os.path.join(cwd, config.defaultDir)
+        logHelper.logHeader()
         parseFolder(target_dir)

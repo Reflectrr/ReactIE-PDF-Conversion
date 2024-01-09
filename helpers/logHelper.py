@@ -2,6 +2,17 @@ import os
 import datetime
 
 
+def logHeader():
+    logPath = os.getcwd() + "/log.txt"
+    errorLogPath = os.getcwd() + "/errorLog.txt"
+    with open(logPath, "a") as logFile:
+        currentTime = datetime.datetime.now()
+        logFile.write(currentTime.strftime("%Y-%m-%d %H:%M:%S") + "start running the parser\n")
+    with open(errorLogPath, "a") as errorLogFile:
+        currentTime = datetime.datetime.now()
+        errorLogFile.write(currentTime.strftime("%Y-%m-%d %H:%M:%S") + "start running the parser\n")
+
+
 def successLog(pdfPath):
     logPath = os.getcwd() + "/log.txt"
     with open(logPath, "a") as logFile:
